@@ -53,7 +53,11 @@ Smart-Communication-Hub/
 ### 1️⃣ Create `.env` file inside `/server`
 ```bash
 PORT=5000
-DATABASE_URL=postgres://username:password@localhost:5432/smart_hub
+DB_NAME=your_database_name
+DB_USER=your_database_user
+DB_HOST=your_database_host
+DB_PORT=your_database_port
+DB_PASS=your_database_password
 CLIENT_URL=http://localhost:3000
 JWT_SECRET=your_jwt_secret_here
 OPENAI_API_KEY=your_openai_api_key_here
