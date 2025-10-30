@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { AuthService } from '../../services';
 import { AuthController } from '../../controllers';
-import { UserRepository} from '../../repositories/user.data';
+import { UserRepository} from '../../repositories/user.repo';
 import { RefreshTokenRepository} from '../../repositories/refreshToken.repo';
 
 // ✅ Instantiate repositories

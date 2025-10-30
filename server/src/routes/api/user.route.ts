@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { UserRepository } from '../../repositories/user.data';
+import { UserRepository } from '../../repositories';
 import { UserService } from '../../services';
 import { UserController } from '../../controllers';
  

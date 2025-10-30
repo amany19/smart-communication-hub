@@ -2,7 +2,7 @@ import Env from '../config/env.config';
 import { parseDuration } from '../utils/durationParsing.utils';
 import bcrypt from 'bcryptjs';
 import { IAuth } from './interfaces';
-import { IUserRepository } from '../repositories/user.data';
+import { IUserRepository } from '../repositories';
 import { IRefreshTokenRepository } from '../repositories/refreshToken.repo';
 import { generateJti, generateUserTokens, verifyToken } from '../utils/auth.util';
 import type { TokenPair } from '../utils/auth.util';

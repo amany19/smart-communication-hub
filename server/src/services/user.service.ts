@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { IUserRepository } from '../repositories/user.data';
+import { IUserRepository } from '../repositories';
 import { UserType } from '../types';
 import { IUser } from './interfaces';
  
