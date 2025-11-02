@@ -1,10 +1,7 @@
-import Image from "next/image";
-import Chat from "./components/Chat";
+import { redirect } from "next/navigation";
+import "./globals.css";
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
- <Chat/>
-    </div>
-  );
+
+  redirect("/register");
 }
