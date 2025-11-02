@@ -34,6 +34,7 @@ Smart-Communication-Hub/
 │   │   ├── config/
 │   │   ├── controllers/
 │   │   ├── services/
+|   |   ├─────interfaces/
 │   │   ├── repositories/
 │   │   ├── models/
 │   │   ├── routes/
@@ -152,4 +153,4 @@ A lightweight `insights` table will store each conversation’s summary and sent
 ## 🧩 Author
 
 **Amany Hamdy**  
-Full Stack Developer Candidate – V.Connct  
+Full Stack Developer
