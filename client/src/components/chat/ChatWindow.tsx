@@ -1,18 +1,27 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChatMessage, User } from "@/types";
 import ChatBubble from "./ChatBubble";
 import ChatHeader from "./ChatHeader";
 import { Send } from "lucide-react";
+import { useAuth } from "@/context/useAuth";
 
 interface ChatWindowProps {
-    receiver: User | null;
+    receiver: any | null;
     messages: ChatMessage[];
     onSendMessage: (text: string) => void;
+    isOnline: boolean;
 }
 
-export default function ChatWindow({ receiver, messages, onSendMessage }: ChatWindowProps) {
+export default function ChatWindow({ receiver, messages, onSendMessage, isOnline }: ChatWindowProps) {
     const [input, setInput] = useState("");
+    const { user } = useAuth();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // ✅ Auto-scroll to bottom when messages change
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     if (!receiver) {
         return (
@@ -37,20 +46,22 @@ export default function ChatWindow({ receiver, messages, onSendMessage }: ChatWi
 
     return (
         <div className="flex flex-col h-full m-0 p-0">
- 
             <div className="flex-shrink-0">
-                <ChatHeader receiver={receiver} />
+                <ChatHeader receiver={receiver} isOnline={isOnline} />
             </div>
 
+            {/* ✅ Messages container with auto-scroll */}
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
                 {messages.map((m) => (
                     <ChatBubble
                         key={m.id}
                         message={m.text}
-                        isSender={m.senderId === "me"}
+                        isSender={m.sender_id === user?.user_id}
                         timestamp={m.timestamp}
                     />
                 ))}
+                {/* ✅ Invisible element at the bottom for auto-scrolling */}
+                <div ref={messagesEndRef} />
             </div>
 
             <div className="flex-shrink-0 p-3 bg-background border-t border-border">

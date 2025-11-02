@@ -50,6 +50,15 @@ export default class MessageController {
             res.status(500).json({ error: error.message });
         }
     };
+    getChatList = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { userId } = req.params;
+            const conversation = await this.messageService.getChatList(userId);
+            res.status(200).json(conversation);
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
+        }
+    };
     // PATCH /messages/:id
     editMessage = async (req: Request, res: Response): Promise<void> => {
         try {

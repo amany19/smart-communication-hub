@@ -4,6 +4,8 @@ export interface UserType {
   email: string;
   passwordHash: string;
   profilePhoto?: string | null;
+  isOnline?:boolean;
+  lastSeen?:Date;
   createdAt?: Date;       
   updatedAt?: Date;
 }

@@ -1,3 +1,5 @@
+import { timeAgo } from "@/utils/time";
+
 interface Props {
   message: string;
   isSender?: boolean;
@@ -18,7 +20,7 @@ ${
       >
         {message}
       </div>
-      <span className="text-[10px] text-text-muted mt-1">{timestamp}</span>
+      <span className="text-[10px] text-text-muted mt-1">{timeAgo(timestamp)}</span>
     </div>
   );
 }

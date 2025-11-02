@@ -7,6 +7,8 @@ export interface ChatUser {
 export interface ChatMessage {
   id?: string;
   text: string;
-  senderId: string;
+  sender_id: string;
+  receiver_id: string;
   timestamp: string;
+  status?:string
 }

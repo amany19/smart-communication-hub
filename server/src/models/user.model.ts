@@ -28,7 +28,7 @@ User.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true, 
+      unique: true,
     },
     passwordHash: {
       type: DataTypes.STRING,
@@ -38,12 +38,21 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    isOnline: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    lastSeen: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     sequelize,
     tableName: 'users',
     modelName: 'User',
   }
+
 );
 
  
