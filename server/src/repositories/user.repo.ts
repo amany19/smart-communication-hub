@@ -6,6 +6,7 @@ export interface IUserRepository {
   createUser(data: Omit<UserType, 'id'>): Promise<UserType>;
   findByEmail(email: string): Promise<UserType | null>;
   findById(id: string): Promise<Omit<UserType, 'passwordHash'> | null>;
+  getAll(): Promise<Omit<UserType, 'passwordHash'>[] | null>;
   updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'passwordHash'> | null>;
   deleteUser(id: string): Promise<boolean>;
 }
@@ -25,7 +26,10 @@ export class UserRepository implements IUserRepository {
     const user = await User.findByPk(id, { attributes: { exclude: ['passwordHash'] } });
     return user ? (user.get({ plain: true }) as UserType) : null;
   }
-
+    async getAll(): Promise<Omit<UserType, 'passwordHash'>[] | null> {
+    const user = await User.findAll({ attributes: { exclude: ['passwordHash'] } });
+    return user?.map( (user)=> (user.get({ plain: true }) as UserType));
+  }
 
   async updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'passwordHash'> | null> {
     const user = await User.findByPk(id, { attributes: { exclude: ['passwordHash'] } });

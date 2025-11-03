@@ -18,6 +18,10 @@ export default class UserService implements IUser {
   async getUser(id: string): Promise<Omit<UserType,'passwordHash'> | null> {
     return await this.userRepo.findById(id);
   }
+    async getAllUsers(): Promise<Omit<UserType,'passwordHash'> []| null> {
+    return await this.userRepo.getAll();
+  }
+
 
   async updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'passwordHash'> | null> {
     return await this.userRepo.updateUser(id, updates);

@@ -35,7 +35,22 @@ export default class UserController {
       res.status(500).json({ error: error.message });
     }
   };
+  // GET /
+  getAllUsers= async (req: Request, res: Response): Promise<void> => {
+    try {
+   
+      const users = await this.userService.getAllUsers();
 
+      if (!users) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      res.status(200).json(users);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  };
   // PUT /users/:id
   updateUser = async (req: Request, res: Response): Promise<void> => {
     try {
