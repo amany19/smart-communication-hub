@@ -8,10 +8,11 @@ import InsightsPanel from "@/components/InsightPanel";
 import { ChatMessage, Insight, User } from "@/types";
 import socket from "@/utils/socket";
 import { useAuth } from "@/context/useAuth";
+import { Menu } from "lucide-react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050/api";
 
-/* ---------- Fetch Functions ---------- */
+/* ---------- Fetch Functions (same as before) ---------- */
 async function fetchMessages(sender_id: string, receiver_id: string) {
   try {
     if (!sender_id || !receiver_id) return [];
@@ -80,6 +81,7 @@ export default function Dashboard() {
   const [onlineUsers, setOnlineUsers] = useState<Record<string, boolean>>({});
   const [isOnline, setIsOnline] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   /* ---------- Load Contacts on Mount ---------- */
   useEffect(() => {
@@ -89,7 +91,6 @@ export default function Dashboard() {
       const chatUsers = await fetchChatUsers(user_id);
       setContacts(chatUsers);
 
-      // Auto-select first contact if exists
       if (chatUsers.length > 0) {
         const first = chatUsers[0];
         setReceiver(first);
@@ -115,37 +116,32 @@ export default function Dashboard() {
   };
 
   /* ---------- Select a Chat ---------- */
-const handleSelectChat = async (contact: any) => {
-  const receiverData =
-    contact.user // chat list item
-      ? contact
-      : { user: contact }; // users list item → wrap into same structure
+  const handleSelectChat = async (contact: any) => {
+    const receiverData = contact.user ? contact : { user: contact };
+    setReceiver(receiverData);
+    setMessages([]);
+    setInsights(null);
 
-  setReceiver(receiverData);
-  setMessages([]);
-  setInsights(null);
+    const receiverId = receiverData.user.id;
+    if (!receiverId || !user_id) return;
 
-  const receiverId = receiverData.user.id;
-  if (!receiverId || !user_id) return;
+    try {
+      const [msgs, ins] = await Promise.all([
+        fetchMessages(user_id, receiverId),
+        fetchInsights(user_id, receiverId)
+      ]);
+      setMessages(msgs);
+      setInsights(ins);
+    } catch (error) {
+      console.error("Error loading chat:", error);
+    }
+  };
 
-  try {
-    const msgs = await fetchMessages(user_id, receiverId);
-    const ins = await fetchInsights(user_id, receiverId);
-
-    setMessages(msgs);
-    setInsights(ins);
-  } catch (error) {
-    console.error("Error loading chat:", error);
-  }
-};
- 
-
-  /* ---------- Socket Setup ---------- */
+  /* ---------- Socket Setup (same as before) ---------- */
   useEffect(() => {
     if (!user_id) return;
 
     socket.connect();
-    socket.emit("userOnline", user_id);
 
     const handleReceiveMessage = (message: ChatMessage) => {
       const isForCurrent =
@@ -162,12 +158,40 @@ const handleSelectChat = async (contact: any) => {
       if (data.user_id === receiver?.user?.id) setIsOnline(data.isOnline);
     };
 
-    socket.on("receiveMessage", handleReceiveMessage);
-    socket.on("updateOnlineStatus", handleOnlineStatus);
+    const handleMessageSent = (data: { tempId: string; actualId: string }) => {
+      setMessages(prev => prev.map(msg =>
+        msg.id === data.tempId ? { ...msg, id: data.actualId, status: 'sent' } : msg
+      ));
+    };
+
+    const handleMessageError = (data: { tempId: string; error: string }) => {
+      setMessages(prev => prev.map(msg =>
+        msg.id === data.tempId ? { ...msg, status: 'failed' } : msg
+      ));
+      console.error('Message failed:', data.error);
+    };
+
+    socket.on('connect', () => {
+      console.log('✅ Socket connected successfully');
+      socket.emit('userOnline', user_id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('❌ Socket disconnected');
+    });
+
+    socket.on('receiveMessage', handleReceiveMessage);
+    socket.on('updateOnlineStatus', handleOnlineStatus);
+    socket.on('messageSent', handleMessageSent);
+    socket.on('messageError', handleMessageError);
 
     return () => {
-      socket.off("receiveMessage", handleReceiveMessage);
-      socket.off("updateOnlineStatus", handleOnlineStatus);
+      socket.off('receiveMessage', handleReceiveMessage);
+      socket.off('updateOnlineStatus', handleOnlineStatus);
+      socket.off('messageSent', handleMessageSent);
+      socket.off('messageError', handleMessageError);
+      socket.off('connect');
+      socket.off('disconnect');
       socket.disconnect();
     };
   }, [user_id, receiver?.user?.id]);
@@ -182,16 +206,35 @@ const handleSelectChat = async (contact: any) => {
       sender_id: user_id,
       receiver_id: receiver.user.id,
       timestamp: new Date().toISOString(),
-      status: "sending",
+      status: 'sending'
     };
 
     setMessages((prev) => [...prev, newMessage]);
-    socket.emit("sendMessage", newMessage);
+
+    socket.emit("sendMessage", {
+      sender_id: user_id,
+      receiver_id: receiver.user.id,
+      text: text,
+      id: newMessage.id,
+      timestamp: new Date().toISOString()
+    });
+  };
+  /* ---------- Mobile Sidebar Toggle ---------- */
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
-  /* ---------- Render ---------- */
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
+  // Show toggle button only on mobile and when sidebar is not open
+  const showToggleButton = !isSidebarOpen;
+
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[350px_1fr_300px] h-screen">
+    <div className="flex h-screen bg-background">
+      {/* Sidebar */}
       <Sidebar
         chatUsers={contacts}
         allUsers={allUsers}
@@ -201,20 +244,32 @@ const handleSelectChat = async (contact: any) => {
         selectedId={receiver?.user?.id ?? null}
         onSelect={handleSelectChat}
         onlineUsers={onlineUsers}
+        isMobileOpen={isSidebarOpen}
+        onMobileClose={closeSidebar}
       />
 
-      <div className="border-x border-border p-0 overflow-y-auto">
-        <ChatWindow
-          receiver={receiver?.user}
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          isOnline={isOnline}
-        />
-      </div>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col md:grid md:grid-cols-[1fr_300px]">
 
-      <InsightsDrawer>
-        <InsightsPanel data={insights as Insight} />
-      </InsightsDrawer>
+        {/* Chat Area */}
+        <div className="flex-1 border-border md:border-r overflow-hidden">
+          <ChatWindow
+            receiver={receiver?.user}
+            messages={messages}
+            onToggleSidebar={toggleSidebar}
+            showToggleButton={showToggleButton}
+            onSendMessage={handleSendMessage}
+            isOnline={isOnline}
+          />
+        </div>
+
+        {/* Insights Panel - Hidden on mobile by default */}
+        <div className="hidden md:block">
+          <InsightsDrawer>
+            <InsightsPanel data={insights as Insight} />
+          </InsightsDrawer>
+        </div>
+      </div>
     </div>
   );
 }

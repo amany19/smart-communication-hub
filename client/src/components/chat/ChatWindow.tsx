@@ -11,9 +11,11 @@ interface ChatWindowProps {
     messages: ChatMessage[];
     onSendMessage: (text: string) => void;
     isOnline: boolean;
+        onToggleSidebar: () => void;
+  showToggleButton?: boolean;
 }
 
-export default function ChatWindow({ receiver, messages, onSendMessage, isOnline }: ChatWindowProps) {
+export default function ChatWindow({ receiver,onToggleSidebar, showToggleButton,messages, onSendMessage, isOnline }: ChatWindowProps) {
     const [input, setInput] = useState("");
     const { user } = useAuth();
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -47,7 +49,7 @@ export default function ChatWindow({ receiver, messages, onSendMessage, isOnline
     return (
         <div className="flex flex-col h-full m-0 p-0">
             <div className="flex-shrink-0">
-                <ChatHeader receiver={receiver} isOnline={isOnline} />
+                <ChatHeader onToggleSidebar={ onToggleSidebar} showToggleButton={showToggleButton} receiver={receiver} isOnline={isOnline} />
             </div>
 
             {/* ✅ Messages container with auto-scroll */}
