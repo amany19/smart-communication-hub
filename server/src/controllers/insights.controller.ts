@@ -3,6 +3,7 @@ import { insightService } from "../services"; // Lowercase 'i' to match instance
 
 class InsightsController {
     async analyze(req: Request, res: Response) {
+
         try {
             const { sender_id, receiver_id } = req.body;
 

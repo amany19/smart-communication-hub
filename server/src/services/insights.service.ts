@@ -1,16 +1,16 @@
 import { openai } from "../config/openai.config";
-import { IMessage } from "./interfaces"; 
+import { IMessage } from "./interfaces";
 import { MessageType } from "../types";
- 
-import { IInsightRepository, InsightRepository, MessageRepository} from "../repositories";
-import { MessageService } from "."; 
+
+import { IInsightRepository, InsightRepository, MessageRepository } from "../repositories";
+import { MessageService } from ".";
 import { generateConversationId } from "../utils/conversation.util";
 import { hfClient } from "../config/hg.config";
 
 export class InsightService {
     constructor(
         private insightRepository: IInsightRepository,
-        private messageService: IMessage 
+        private messageService: IMessage
     ) { }
 
     async openAiAnalyzeConversationPrompt(messages: string[]): Promise<{ summary: string; sentiment: string }> {
@@ -20,7 +20,7 @@ export class InsightService {
 
         const conversationText = messages.join("\n");
         const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini", 
+            model: "gpt-4o-mini",
             messages: [
                 {
                     role: "system",
@@ -47,57 +47,59 @@ Return JSON only: {"summary":"...", "sentiment":"..."}`,
 
         return JSON.parse(output);
     }
-async hf_SummarizeConversation(conversation: string[]) {
-    const text = conversation.join("\n");
+    async hf_SummarizeConversation(conversation: string[]) {
+        const text = conversation.join("\n");
 
-    const result = await hfClient.summarization({
-      model: "facebook/bart-large-cnn",
-      inputs: text,
-    });
+        const result = await hfClient.summarization({
+            model: "facebook/bart-large-cnn",
+            inputs: text,
+        });
 
-    return result.summary_text;
-  }
+        return result.summary_text;
+    }
 
-  async hfAnalyzeSentiment(conversation: string[]) {
-    const text = conversation.join("\n");
+    async hfAnalyzeSentiment(conversation: string[]) {
+        const text = conversation.join("\n");
 
-    const result = await hfClient.textClassification({
-      model: "distilbert-base-uncased-finetuned-sst-2-english",
-      inputs: text,
-    });
+        const result = await hfClient.textClassification({
+            model: "distilbert-base-uncased-finetuned-sst-2-english",
+            inputs: text,
+        });
 
-    
-    const top = result[0];
 
-    return {
-      label: top.label, 
-      score: top.score,
-    };
-  }
-  async hfAnalyzeConversation(user1Id: string, user2Id: string): Promise<any> {
-            const messagesData = await this.messageService.getConversation(user1Id, user2Id);
+        const top = result[0];
+
+        return {
+            label: top.label,
+            score: top.score,
+        };
+    }
+    async hfAnalyzeConversation(user1Id: string, user2Id: string): Promise<any> {
+        const messagesData = await this.messageService.getConversation(user1Id, user2Id);
         const messages = messagesData.map((m: MessageType) => m.text);
+        const conversationId = generateConversationId(user1Id, user2Id);
 
         if (messages.length === 0) {
-            throw new Error("No messages found in conversation");
+            
+            return { conversation_id: conversationId,summary: null, sentiment: null };
         }
 
         const summary = await this.hf_SummarizeConversation(messages);
         const sentiment = await this.hfAnalyzeSentiment(messages);
-        const conversationId = generateConversationId(user1Id, user2Id);
-               await this.insightRepository.upsertInsight({
+        await this.insightRepository.upsertInsight({
             conversation_id: conversationId,
             summary: summary,
             sentiment: sentiment.label,
         });
-       return {
+        return {
             conversation_id: conversationId,
             summary: summary,
             sentiment: sentiment.label,
         }
 
-  }
+    }
     async openAiAnalyzeConversation(user1Id: string, user2Id: string): Promise<any> {
+
         const messagesData = await this.messageService.getConversation(user1Id, user2Id);
         const messages = messagesData.map((m: MessageType) => m.text);
 
@@ -108,20 +110,20 @@ async hf_SummarizeConversation(conversation: string[]) {
         const analysis = await this.openAiAnalyzeConversationPrompt(messages);
         const conversationId = generateConversationId(user1Id, user2Id);
 
-         return {
+        return {
             conversation_id: conversationId,
             summary: analysis.summary,
             sentiment: analysis.sentiment,
         }
     }
     async analyzeAndStoreConversation(user1Id: string, user2Id: string): Promise<any> {
-       
+
 
         const analysis = await this.hfAnalyzeConversation(user1Id, user2Id);
- console.log(analysis)
+        console.log(analysis)
 
-       await this.insightRepository.upsertInsight(analysis);
-         return analysis
+        await this.insightRepository.upsertInsight(analysis);
+        return analysis
     }
 }
 

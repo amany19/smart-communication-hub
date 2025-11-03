@@ -1,8 +1,8 @@
  export interface InsightType {
   id: string;
   conversation_id: string;
-  summary: string;
-  sentiment: string;
+  summary?: string;
+  sentiment?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -59,7 +59,10 @@ async function fetchInsights(sender_id: string, receiver_id: string) {
       credentials: "include",
       body: JSON.stringify({ sender_id, receiver_id }),
     });
-    if (!res.ok) throw new Error("Failed to analyze");
+    if (!res.ok) {
+      console.log("Fetching insights for:", { sender_id: sender_id, receiver_id: receiver_id });
+
+      throw new Error("Failed to analyze")};
     return await res.json();
   } catch (error) {
     console.error("Failed to fetch insights:", error);
@@ -77,32 +80,61 @@ export default function Dashboard() {
   const [showAllUsers, setShowAllUsers] = useState(false);
   const [receiver, setReceiver] = useState<any | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [insights, setInsights] = useState<{ summary: string; sentiment: string } | null>(null);
+ const [insights, setInsights] = useState<{ summary: string; sentiment: string } | null>(null);
+const [insightsError, setInsightsError] = useState<string | null>(null);
+
   const [onlineUsers, setOnlineUsers] = useState<Record<string, boolean>>({});
   const [isOnline, setIsOnline] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  /* ---------- Load Contacts on Mount ---------- */
-  useEffect(() => {
-    if (!user_id) return;
+/* ---------- Load Contacts on Mount ---------- */
+useEffect(() => {
+  if (!user_id) return;
 
-    const loadContacts = async () => {
-      const chatUsers = await fetchChatUsers(user_id);
-      setContacts(chatUsers);
+  const loadContacts = async () => {
+    const chatUsers = await fetchChatUsers(user_id);
+    setContacts(chatUsers);
 
-      if (chatUsers.length > 0) {
-        const first = chatUsers[0];
-        setReceiver(first);
-        const msgs = await fetchMessages(user_id, first.user.id);
-        setMessages(msgs);
-        const insights = await fetchInsights(user_id, first.user.id);
-        setInsights(insights);
+    if (chatUsers.length > 0) {
+      const first = chatUsers[0];
+      setReceiver(first);
+      const msgs = await fetchMessages(user_id, first.user.id);
+      setMessages(msgs);
+      // ❌ Don’t call fetchInsights here yet
+    }
+  };
+
+  loadContacts();
+}, [user_id]);
+
+/* ---------- Fetch Insights Separately ---------- */
+useEffect(() => {
+  if (!user_id || !receiver?.user?.id) return;
+
+  const loadInsights = async () => {
+    setInsightsError(null);
+    setInsights(null);
+
+    try {
+      const data = await fetchInsights(user_id, receiver.user.id);
+      if (!data) {
+        setInsightsError("No insights available");
+        return;
       }
-    };
+      setInsights(data);
+    } catch (err) {
+      console.error("❌ Insight fetch failed:", err);
+      setInsightsError("Failed to analyze insights");
+    }
+  };
 
-    loadContacts();
-  }, [user_id]);
+  // Add a small delay if backend takes time
+  const timer = setTimeout(loadInsights, 300); // 300ms delay
+
+  return () => clearTimeout(timer);
+}, [user_id, receiver]);
+
 
   /* ---------- Toggle Contacts / All Users ---------- */
   const handleToggleUsersView = async () => {
@@ -126,14 +158,23 @@ export default function Dashboard() {
     if (!receiverId || !user_id) return;
 
     try {
-      const [msgs, ins] = await Promise.all([
-        fetchMessages(user_id, receiverId),
-        fetchInsights(user_id, receiverId)
+      const [msgs, insightsData] = await Promise.all([
+       await fetchMessages(user_id, receiverId),
+       await fetchInsights(user_id, receiverId)
       ]);
       setMessages(msgs);
-      setInsights(ins);
+      
+      if (!insightsData) {
+        setInsightsError("Failed fetching insights");
+        setInsights(null);
+      } else {
+        setInsights(insightsData);
+        setInsightsError(null);
+      }
     } catch (error) {
-      console.error("Error loading chat:", error);
+      console.error("Error loading chat or insights:", error);
+      setInsightsError("Failed fetching insights");
+    
     }
   };
 

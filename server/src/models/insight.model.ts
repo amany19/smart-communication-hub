@@ -32,14 +32,13 @@ Insight.init(
     },
     summary: {
       type: DataTypes.TEXT,
-      allowNull: false,
       validate: {
         notEmpty: true,
       }
     },
     sentiment: {
       type: DataTypes.STRING,
-      allowNull: false,
+
  
     },
 
