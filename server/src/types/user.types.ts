@@ -2,7 +2,7 @@ export interface UserType {
   id: string;
   name: string;
   email: string;
-  passwordHash: string;
+  password: string;
   profilePhoto?: string | null;
   isOnline?:boolean;
   lastSeen?:Date;
@@ -11,4 +11,4 @@ export interface UserType {
 }
 
 export interface UserCreationAttributes
-  extends Partial<Omit<UserType, 'email' | 'passwordHash' | 'name'>> {}
+  extends Partial<Omit<UserType, 'email' | 'password' | 'name'>> {}

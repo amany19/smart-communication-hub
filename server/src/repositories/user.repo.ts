@@ -5,9 +5,9 @@ import { UserType } from '../types/user.types';
 export interface IUserRepository {
   createUser(data: Omit<UserType, 'id'>): Promise<UserType>;
   findByEmail(email: string): Promise<UserType | null>;
-  findById(id: string): Promise<Omit<UserType, 'passwordHash'> | null>;
-  getAll(): Promise<Omit<UserType, 'passwordHash'>[] | null>;
-  updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'passwordHash'> | null>;
+  findById(id: string): Promise<Omit<UserType, 'password'> | null>;
+  getAll(): Promise<Omit<UserType, 'password'>[] | null>;
+  updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'password'> | null>;
   deleteUser(id: string): Promise<boolean>;
 }
 
@@ -22,17 +22,17 @@ export class UserRepository implements IUserRepository {
     return user ? (user.get({ plain: true }) as UserType) : null;
   }
 
-  async findById(id: string): Promise<Omit<UserType, 'passwordHash'> | null> {
-    const user = await User.findByPk(id, { attributes: { exclude: ['passwordHash'] } });
+  async findById(id: string): Promise<Omit<UserType, 'password'> | null> {
+    const user = await User.findByPk(id, { attributes: { exclude: ['password'] } });
     return user ? (user.get({ plain: true }) as UserType) : null;
   }
-    async getAll(): Promise<Omit<UserType, 'passwordHash'>[] | null> {
-    const user = await User.findAll({ attributes: { exclude: ['passwordHash'] } });
+    async getAll(): Promise<Omit<UserType, 'password'>[] | null> {
+    const user = await User.findAll({ attributes: { exclude: ['password'] } });
     return user?.map( (user)=> (user.get({ plain: true }) as UserType));
   }
 
-  async updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'passwordHash'> | null> {
-    const user = await User.findByPk(id, { attributes: { exclude: ['passwordHash'] } });
+  async updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'password'> | null> {
+    const user = await User.findByPk(id, { attributes: { exclude: ['password'] } });
     if (!user) return null;
     await user.update(updates);
     return user.get({ plain: true }) as UserType;

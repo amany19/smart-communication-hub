@@ -1,12 +1,16 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services';
+import { console } from 'node:inspector';
  
 export default class UserController {
   constructor(private userService: UserService) {}
 
   // POST /users/register
   register = async (req: Request, res: Response): Promise<void> => {
+          console.log("loggerrrrr")
+      console.log(req.body)
     try {
+
       const user = await this.userService.register(req.body);
       res.status(201).json({
         message: 'User registered successfully',

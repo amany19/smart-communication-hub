@@ -7,7 +7,7 @@ export default class User extends Model<UserType, UserCreationAttributes> implem
   public id!: string;
   public name!: string;
   public email!: string;
-  public passwordHash!: string;
+  public password!: string;
   public profilePhoto?: string | null;
 
   public readonly createdAt!: Date;
@@ -30,9 +30,10 @@ User.init(
       allowNull: false,
       unique: true,
     },
-    passwordHash: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
+
     },
     profilePhoto: {
       type: DataTypes.STRING,

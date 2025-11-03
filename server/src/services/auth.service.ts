@@ -17,7 +17,7 @@ export default class AuthService implements IAuth {
     if (!user) {
       throw new Error('Invalid credentials');
     }
-    const valid = await bcrypt.compare(password, user.passwordHash);
+    const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
       throw new Error('Invalid credentials');
     }

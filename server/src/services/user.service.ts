@@ -11,19 +11,19 @@ export default class UserService implements IUser {
     const existing = await this.userRepo.findByEmail(data.email);
     if (existing) throw new Error('Email already in use');
 
-    const passwordHash = await bcrypt.hash(data.passwordHash, 10);
-    return await this.userRepo.createUser({ ...data, passwordHash });
+    const password = await bcrypt.hash(data.password, 10);
+    return await this.userRepo.createUser({ ...data, password });
   }
 
-  async getUser(id: string): Promise<Omit<UserType,'passwordHash'> | null> {
+  async getUser(id: string): Promise<Omit<UserType,'password'> | null> {
     return await this.userRepo.findById(id);
   }
-    async getAllUsers(): Promise<Omit<UserType,'passwordHash'> []| null> {
+    async getAllUsers(): Promise<Omit<UserType,'password'> []| null> {
     return await this.userRepo.getAll();
   }
 
 
-  async updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'passwordHash'> | null> {
+  async updateUser(id: string, updates: Partial<UserType>): Promise<Omit<UserType, 'password'> | null> {
     return await this.userRepo.updateUser(id, updates);
   }
 
