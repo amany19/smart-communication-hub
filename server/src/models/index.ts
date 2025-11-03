@@ -2,7 +2,7 @@ import sequelize from "../config/database.config";
 import  RefreshToken from "./refreshToken.model";
 import User from "./user.model";
 import Message from "./message.model";
-
+import Insight from "./insight.model";
 //associations
 //RefreshToken ↔ User
 User.hasMany(RefreshToken, { foreignKey: 'userId', onDelete: 'CASCADE' });
@@ -29,4 +29,4 @@ Message.belongsTo(User, {
   foreignKey: 'receiver_id',
   as: 'receiver',
 });
-export { User, RefreshToken ,Message};
+export { User, RefreshToken ,Message, Insight};

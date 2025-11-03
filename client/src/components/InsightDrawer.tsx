@@ -14,7 +14,7 @@ export default function InsightsDrawer({ children }: { children: React.ReactNode
       </button>
 
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-surface dark:bg-darkSurface border-t border-border p-5 rounded-t-xl transition-transform duration-300 ${
+        className={`fixed bottom-0 left-0 right-0 bg-surface dark:bg-darkSurface border-t border-border p-0 transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-full"
         } md:static md:translate-y-0 md:w-80 md:border-l`}
       >

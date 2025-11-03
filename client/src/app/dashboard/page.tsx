@@ -5,7 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import ChatWindow from "@/components/chat/ChatWindow";
 import InsightsDrawer from "@/components/InsightDrawer";
 import InsightsPanel from "@/components/InsightPanel";
-import { ChatMessage, User } from "@/types";
+import { ChatMessage, Insight, User } from "@/types";
 import socket from "@/utils/socket";
 import { useAuth } from "@/context/useAuth";
 
@@ -42,6 +42,24 @@ async function fetchContacts(user_id: string) {
     return [];
   }
 }
+//fetch insights 
+async function fetchInsights(sender_id: string, receiver_id: string) {
+  try {
+    const res = await fetch(`${BASE_URL}/insights/analyze`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ sender_id, receiver_id }),
+    });
+
+    if (!res.ok) throw new Error("Failed to analyze");
+
+    const data = await res.json();
+    return data 
+  } catch (error) {
+    console.error("Failed to fetch insights:", error);
+  }
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -52,6 +70,7 @@ export default function Dashboard() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<Record<string, boolean>>({});
   const [isOnline, setIsOnline] = useState(false);
+  const [insights, setInsights] = useState<{ summary: string; sentiment: string } | null>(null);
 
   // Load contacts first, then messages for the first contact
   useEffect(() => {
@@ -75,6 +94,8 @@ export default function Dashboard() {
 
     (async () => {
       const msgs = await fetchMessages(user_id, receiver.user.id);
+    const insights=await fetchInsights(user_id, receiver.user.id);
+setInsights(insights)
       setMessages(msgs);
     })();
   }, [receiver, user_id]);
@@ -210,7 +231,7 @@ export default function Dashboard() {
       </div>
 
       <InsightsDrawer>
-        <InsightsPanel />
+        <InsightsPanel data={insights as Insight} />
       </InsightsDrawer>
     </div>
   );

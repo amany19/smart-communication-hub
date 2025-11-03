@@ -29,7 +29,7 @@ export default function InsightsPanel({
 
   return (
     <aside
-      className="w-full md:w-[320px] bg-surface dark:bg-darkSurface border-l border-border p-4 overflow-y-auto h-full"
+      className="w-full md:w-[320px] bg-surface dark:bg-darkSurface border-l border-border p-1 overflow-y-auto h-full"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -83,7 +83,7 @@ export default function InsightsPanel({
           </span>
 
           {/* Summary */}
-          <div className="p-3 rounded-lg bg-background dark:bg-darkBg border border-border mb-3">
+          <div className="p-3 mr-6 rounded-lg bg-background dark:bg-darkBg border border-border mb-3">
             <p className="text-sm text-text dark:text-darkText leading-relaxed">
               {data?.summary}
             </p>
