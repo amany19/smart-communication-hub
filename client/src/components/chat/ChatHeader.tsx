@@ -1,18 +1,24 @@
 "use client";
+import { useSocket } from "@/context/SocketContext";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { User } from "@/types";
 import { Menu } from "lucide-react";
 
 interface ChatHeaderProps {
   receiver: User;
-  isOnline: boolean; 
+
     onToggleSidebar: () => void;
   showToggleButton?: boolean;
 }
 
-export default function ChatHeader({ receiver,onToggleSidebar, showToggleButton,isOnline }: ChatHeaderProps) {
+export default function ChatHeader({ receiver,onToggleSidebar, showToggleButton}: ChatHeaderProps) {
   
   const initial = receiver.name?.charAt(0).toUpperCase();
-
+    const { socket } = useSocket();
+  const onlineStatus = useOnlineStatus(socket);
+  const isOnline = receiver?.id
+    ? onlineStatus[receiver.id]?.isOnline
+    : false;
   return (
     <div className="flex items-center justify-between gap-3 p-3 bg-surface border-b border-border select-none">
      <div className="flex flex-row">

@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useState, useEffect, ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
-import { loginUser } from "@/api/auth";
+import { loginUser } from "@/lib/api/auth";
 
 interface DecodedToken {
   user_id?: string;

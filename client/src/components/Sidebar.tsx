@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { User } from "@/types";
 import { UserRoundPen, Users, MessageCircle, X } from "lucide-react";
+import { useSocket } from "@/context/SocketContext";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 interface SidebarProps {
   chatUsers: any[];
@@ -10,25 +12,26 @@ interface SidebarProps {
   loading: boolean;
   onSelect: (user: User) => void;
   selectedId: string | null;
-  onlineUsers: Record<string, boolean>;
+
   onToggleView: () => void;
   isMobileOpen?: boolean;
   onMobileClose?: () => void;
 }
 
-export default function Sidebar({ 
+export default function Sidebar({
   chatUsers,
   allUsers,
   showAllUsers,
   loading,
   onSelect,
-  selectedId, 
-  onlineUsers,
+  selectedId,
+
   onToggleView,
   isMobileOpen = false,
   onMobileClose
 }: SidebarProps) {
-
+  const { socket } = useSocket();
+  const onlineStatus = useOnlineStatus(socket);
   const handleUserSelect = (user: User) => {
     onSelect(user);
     // Close sidebar on mobile after selection
@@ -47,14 +50,14 @@ export default function Sidebar({
     <>
       {/* Mobile Overlay */}
       {isMobileOpen && (
-        <div 
+        <div
           className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={onMobileClose}
         />
       )}
 
       {/* Sidebar */}
-<aside className={`
+      <aside className={`
   fixed md:relative inset-y-0 right-0 z-50
   bg-surface border-l border-border p-4 w-[350px] max-w-[85vw]  // Changed border-r to border-l
   transform transition-transform duration-300 ease-in-out
@@ -91,11 +94,13 @@ export default function Sidebar({
             displayList?.map((item) => {
               const user = showAllUsers ? item : item.user;
               const lastMessage = showAllUsers ? null : item.lastMessage;
-              
+
               const initial = user.name?.charAt(0).toUpperCase();
               const isSelected = selectedId === user.id;
-              const isOnline = onlineUsers[user.id];
 
+              const isOnline = user?.id
+                ? onlineStatus[user?.id]?.isOnline
+                : false;
               return (
                 <div
                   key={user.id}
@@ -118,10 +123,9 @@ export default function Sidebar({
                       </div>
                     )}
                     {/* Online status indicator */}
-                    <div 
-                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-                        isOnline ? 'bg-green-500' : 'bg-gray-400'
-                      }`} 
+                    <div
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-400'
+                        }`}
                     />
                   </div>
 
@@ -141,8 +145,8 @@ export default function Sidebar({
                     </div>
                     <div className="flex justify-between items-center mt-1">
                       <span className="text-xs text-gray-500 truncate">
-                        {showAllUsers 
-                          ? (user.status || "Available") 
+                        {showAllUsers
+                          ? (user.status || "Available")
                           : (lastMessage?.text || "No messages yet")
                         }
                       </span>
@@ -172,13 +176,8 @@ export default function Sidebar({
         </div>
 
         {/* Bottom section */}
-        <div className="mt-4 pt-4 border-t border-border">
-          <div className="flex justify-between items-center">
-            {/* View mode indicator */}
-            <div className="text-xs text-gray-500">
-              {showAllUsers ? "All Users" : "Chats"}
-            </div>
-            
+        <div className="mt-4 pt-4 ">
+          <div className="flex justify-end items-center">
             {/* Toggle button */}
             <button
               onClick={handleToggleUsersView}

@@ -88,26 +88,7 @@ export default function InsightsPanel({
               {data?.summary}
             </p>
           </div>
- {/* May be handled later */}
-          {/* Tags
-          {data.tags && data.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {data.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="bg-accent text-text px-2 py-1 rounded-full text-xs"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-     
-          {data.confidence !== undefined && (
-            <p className="text-xs text-text-muted mt-2">
-              Confidence: {(data.confidence * 100).toFixed(1)}%
-            </p>
-          )} */}
+
         </>
       )}
     </aside>
