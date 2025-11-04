@@ -13,7 +13,7 @@ Built as part of the **V.Connct Full Stack Developer Challenge**.
 | **Backend** | Node.js, Express, TypeScript |
 | **Database** | PostgreSQL with Sequelize ORM |
 | **Real-Time** | Socket.io |
-| **AI Integration** | OpenAI API |
+| **AI Integration** | HuggingFace|
 | **Deployment (Optional)** | Vercel / Render / Docker |
 
 ---
@@ -23,28 +23,52 @@ Built as part of the **V.Connct Full Stack Developer Challenge**.
 ```
 Smart-Communication-Hub/
 │
-├── client/                # Frontend (Next.js + TypeScript)
-│   ├── src/
-│   ├── public/
-│   ├── .env.local
-│   └── package.json
+├── client/                             # Frontend (Next.js + TypeScript)
+│   └── src/
+│       ├── app/                        # App Router entry
+│       │   ├── login/                  # Login page
+│       │   ├── register/               # Registration page
+│       │   └── dashboard/              # Dashboard route (page only)
+│       │        └── page.tsx           
+│       │
+│       ├── components/                 # Shared/global components
+│       │   ├── DashboardContainer.tsx  # Container (logic & state)
+│       │   └── DashboardView.tsx       # UI-only presentation
+│       │
+│       ├── lib/
+│       │   └── api/                    # api layer
+│       │        ├── messages.ts
+│       │        ├── users.ts
+│       │        └── insights.ts
+│       │
+│       ├── hooks/
+│       │   └── useSocket.ts            # custom hooks
+│       │
+│       ├── context/
+│       │   └── AuthContext.ts          # context & persistence
+│       │
+│       ├──types/                      # Shared TypeScript types
+│       └──utils/                      # small helper utilities used
 │
-├── server/                # Backend (Express + TypeScript)
+├── server/                             # Backend (Express + TypeScript)
 │   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── services/
-|   |   ├─────interfaces/
-│   │   ├── repositories/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   └── app.ts, server.ts
+│   │   ├── config/                     # Environment & 3rd-party config
+│   │   ├── controllers/                # HTTP route handlers
+│   │   ├── services/                   # Business logic (AI insights, messaging)
+│   │   │   └── interfaces/             # DTOs / service contracts
+│   │   ├── repositories/               # Data access layer (DB queries)
+│   │   ├── models/                     # Database models (ORM)
+│   │   ├── sockets/                    # socket io 
+│   │   ├── routes/                     # API route definitions
+│   │   └── app.ts, server.ts           # Express  server init
+│   │
 │   ├── .env
 │   └── package.json
 │
 ├── .gitignore
 ├── README.md
 └── package.json
+
 ```
 
 ---
@@ -99,7 +123,7 @@ Visit: 👉 [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🧱 Upcoming Features
+## 🧱Finished Features
 
 - ✅ JWT Authentication (Register/Login)
 - ✅ Real-Time Chat via Socket.io
@@ -107,7 +131,6 @@ Visit: 👉 [http://localhost:3000](http://localhost:3000)
 - ✅ PostgreSQL Database Integration
 - ✅ Mobile Responsive Dashboard
 - ✅ Online Users Indicator
-- ✅ Docker Deployment (optional)
 
 ---
 
@@ -142,13 +165,16 @@ feat(auth): implement user registration and login
 
 ---
 
-## 🧠 About AI Integration
+## 🧠 AI Insights (Summarization & Sentiment)
 
-AI insights will summarize or tag user conversations.  
-This will be implemented using the **OpenAI API** (via `text-embedding` or `chat/completions` endpoint).  
-A lightweight `insights` table will store each conversation’s summary and sentiment.
+This project uses AI to analyze conversations between users and generate:
+- A short summary of the chat
+- Overall sentiment (positive, negative, or neutral)
 
----
+AI is used here to enhance user experience, provide quick context, and enable conversation analytics.
+
+HuggingFace models were integrated for free and reliable inference during development.
+ OpenAI integration was included as an optional alternative for environments with available credits. The generated insights are stored in an `insights` table and updated whenever a conversation changes.
 
 ## 🧩 Author
 
