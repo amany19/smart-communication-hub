@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChatMessage, User } from "@/types";
 import ChatBubble from "./ChatBubble";
 import ChatHeader from "./ChatHeader";
-import { Send } from "lucide-react";
+import { Menu, Send, UserRoundPen } from "lucide-react";
 import { useAuth } from "@/context/useAuth";
 
 interface ChatWindowProps {
@@ -34,8 +34,11 @@ export default function ChatWindow({
 
   if (!receiver) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-500">
+      <div className="flex flex-col items-center justify-center h-full text-gray-500">
         Select a user to start chatting
+        <button className="mt-4 " onClick={onToggleSidebar }>
+            <UserRoundPen size={50} className="text-primary"/>
+        </button>
       </div>
     );
   }
