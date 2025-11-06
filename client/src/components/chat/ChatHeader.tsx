@@ -20,7 +20,9 @@ export default function ChatHeader({ onToggleSidebar, showToggleButton }: ChatHe
   const isOnline = receiver?.id
     ? onlineStatus[receiver?.id]?.isOnline
     : false;
-
+  // console.log(`receiver ${receiver?.id}`)
+  // console.log(`online status ${isOnline}`)
+  // console.log(`online status ${onlineStatus['9eb6464d-2f7c-4825-93e8-d4d4eb87ac47']}`)
   return (<>
     <div className="flex items-center justify-between gap-3 p-3 bg-surface border-b border-border select-none">
       <div className="flex flex-row">

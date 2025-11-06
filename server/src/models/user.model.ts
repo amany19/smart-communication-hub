@@ -39,14 +39,6 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    isOnline: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    lastSeen: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
   },
   {
     sequelize,

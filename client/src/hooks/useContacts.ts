@@ -11,33 +11,25 @@ export function useContacts() {
   const userId = user?.user_id;
 
   const loadContacts = useCallback(async () => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
+    if (!userId) return;
 
     try {
       setLoading(true);
-      setError(null);
       const chatUsers = await fetchChatUsers(userId);
       setContacts(chatUsers || []);
+      setError(null);
     } catch (err) {
-      console.error("Failed to fetch contacts:", err);
+      console.error("❌ Failed to fetch contacts:", err);
       setError("Failed to load conversations. Please try again.");
-      setContacts([]); // Reset to empty array on error
+      setContacts([]);
     } finally {
       setLoading(false);
     }
   }, [userId]);
 
   useEffect(() => {
-    loadContacts();
-  }, [loadContacts]);
+    if (userId) loadContacts();
+  }, [userId, loadContacts]);
 
-  return { 
-    contacts, 
-    loading, 
-    error,
-    refetch: loadContacts // Provide retry capability
-  };
+  return { contacts, loading, error, refetch: loadContacts };
 }

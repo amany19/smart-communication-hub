@@ -5,7 +5,6 @@ import { useState } from "react";
 export default function InsightsDrawer({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 const {receiver} =useReceiver()
-console.log(receiver)
   return (
     <>
       {/* Mobile Trigger Button */}
