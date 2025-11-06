@@ -1,40 +1,74 @@
-// hooks/useChat.ts
-import { useState } from "react";
-import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/context/useAuth";
+import { fetchMessages } from "@/lib/api";
 import { ChatMessage } from "@/types";
-import { useReceiveMessage } from "./useReceiveMessage";
-import { v4 as uuidv4 } from "uuid";
-
+import { useEffect, useState, useCallback } from "react";
+import { useSocket } from "@/context/SocketContext";
+import {v4 as UUIDV4} from 'uuid'
 export function useChat(receiverId?: string) {
-  const { socket } = useSocket();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+  const { socket } = useSocket();
   const userId = user?.user_id;
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  useEffect(() => {
+    if (!userId || !receiverId) {
+      setMessages([]);
+      return;
+    }
 
-  // ✅ Handle receiving messages (only for current chat)
-  useReceiveMessage(socket, receiverId, setMessages);
+    const loadMessageHistory = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchMessages(userId, receiverId);
+        setMessages(data || []);
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // ✅ Sending message logic included here directly
-  const sendMessage = (text: string) => {
+    loadMessageHistory();
+  }, [userId, receiverId]);
+  useEffect(() => {
+    if (!socket || !receiverId) return;
+
+    const handleReceiveMessage = (message: ChatMessage) => {
+      if (
+        (message.sender_id === receiverId && message.receiver_id === userId) ||
+        (message.sender_id === userId && message.receiver_id === receiverId)
+      ) {
+        setMessages(prev => 
+          prev.some(m => m.id === message.id) ? prev : [...prev, message]
+        );
+      }
+    };
+
+    socket.on("receiveMessage", handleReceiveMessage);
+    return () => {
+      socket.off("receiveMessage", handleReceiveMessage);
+    };
+  }, [socket, userId, receiverId]);
+
+  const sendMessage = useCallback((text: string) => {
     if (!socket || !userId || !receiverId) return;
 
     const newMessage: ChatMessage = {
-      id: uuidv4(),
+      id: UUIDV4(), 
       text,
       sender_id: userId,
       receiver_id: receiverId,
       timestamp: new Date().toISOString(),
       status: "sending",
     };
-
-    // Optimistic UI update
-    setMessages((prev) => [...prev, newMessage]);
-
-    // Emit message
+    setMessages(prev => [...prev, newMessage]);
     socket.emit("sendMessage", newMessage);
-  };
+  }, [socket, userId, receiverId]);
 
-  return { messages, setMessages, sendMessage };
+  return {
+    messages,
+    sendMessage,
+    loading,
+  };
 }

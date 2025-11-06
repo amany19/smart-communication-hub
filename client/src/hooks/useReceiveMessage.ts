@@ -1,4 +1,3 @@
-// hooks/useReceiveMessage.ts
 import { useEffect } from "react";
 import { ChatMessage } from "@/types";
 import { Socket } from "socket.io-client";

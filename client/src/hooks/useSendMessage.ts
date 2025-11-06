@@ -1,4 +1,3 @@
-// hooks/useSendMessage.ts
 import { useAuth } from "@/context/useAuth";
 import { ChatMessage } from "@/types";
 import { Socket } from "socket.io-client";
@@ -26,10 +25,7 @@ export function useSendMessage(
         status: "sending",
       };
 
-      // Optimistic UI update
       setMessages((prev) => [...prev, newMessage]);
-
-      // Emit to server
       socket.emit("sendMessage", newMessage);
     },
     [socket, userId, receiverId, setMessages]

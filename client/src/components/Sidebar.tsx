@@ -1,73 +1,69 @@
 "use client";
 import { useState } from "react";
-import { User } from "@/types";
 import { UserRoundPen, Users, MessageCircle, X } from "lucide-react";
 import { useSocket } from "@/context/SocketContext";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useContacts } from "@/hooks/useContacts";
+import { useReceiver } from "@/context/ReceiverContext";
+import { useAllUsers } from "@/hooks/useAllUsers";
 
 interface SidebarProps {
-  chatUsers: any[];
-  allUsers: any[];
-  showAllUsers: boolean;
-  loading: boolean;
-  onSelect: (user: User) => void;
-  selectedId: string | null;
-
-  onToggleView: () => void;
   isMobileOpen?: boolean;
   onMobileClose?: () => void;
 }
 
 export default function Sidebar({
-  chatUsers,
-  allUsers,
-  showAllUsers,
-  loading,
-  onSelect,
-  selectedId,
-
-  onToggleView,
   isMobileOpen = false,
   onMobileClose
 }: SidebarProps) {
+  const [showAllUsers, setShowAllUsers] = useState(false);
+  const { receiver, setReceiver } = useReceiver();
   const { socket } = useSocket();
   const onlineStatus = useOnlineStatus(socket);
-  const handleUserSelect = (user: User) => {
-    onSelect(user);
+  const {contacts} = useContacts();
+  const { users, loading, error } = useAllUsers();
+
+  /* ---------- Select a Chat ---------- */
+  const handleSelectChat = (contact: any) => {
+    const receiverData = contact.user ? contact.user : contact;
+    setReceiver(receiverData);
+    
     // Close sidebar on mobile after selection
     if (onMobileClose) {
       onMobileClose();
     }
   };
 
+  /* ---------- Toggle Between All Users and Chat Users ---------- */
   const handleToggleUsersView = () => {
-    onToggleView();
+    setShowAllUsers(prev => !prev);
   };
 
-  const displayList = showAllUsers ? allUsers : chatUsers;
+  const displayList = showAllUsers ? users : contacts;
+  const currentView = showAllUsers ? "All Users" : "Chats";
 
   return (
     <>
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="md:hidden fixed bg-black bg-opacity-50 z-60"
           onClick={onMobileClose}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-  fixed md:relative inset-y-0 right-0 z-50
-  bg-surface border-l border-border p-4 w-[350px] max-w-[85vw]  // Changed border-r to border-l
-  transform transition-transform duration-300 ease-in-out
-  ${isMobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
-  flex flex-col
-`}>
+        fixed md:relative inset-y-0 right-0 z-60
+        bg-surface border-l border-border p-4 w-[350px] max-w-[85vw]
+        transform transition-transform duration-300 ease-in-out
+        ${isMobileOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+        flex flex-col
+      `}>
         {/* Mobile Header */}
         <div className="flex items-center justify-between mb-4 md:hidden">
           <h2 className="text-lg font-semibold text-gray-800">
-            {showAllUsers ? "All Users" : "Chats"}
+            {currentView}
           </h2>
           <button
             onClick={onMobileClose}
@@ -94,17 +90,14 @@ export default function Sidebar({
             displayList?.map((item) => {
               const user = showAllUsers ? item : item.user;
               const lastMessage = showAllUsers ? null : item.lastMessage;
-
               const initial = user.name?.charAt(0).toUpperCase();
-              const isSelected = selectedId === user.id;
+              const isSelected = receiver?.id === user.id;
+              const isOnline = user?.id ? onlineStatus[user?.id]?.isOnline : false;
 
-              const isOnline = user?.id
-                ? onlineStatus[user?.id]?.isOnline
-                : false;
               return (
                 <div
                   key={user.id}
-                  onClick={() => handleUserSelect(user)}
+                  onClick={() => handleSelectChat(item)}
                   className={`flex items-center gap-3 p-3 rounded-md cursor-pointer transition-colors
                     ${isSelected ? "bg-primary-light/40 text-primary-dark" : "hover:bg-primary-light/20"}
                     active:scale-95 md:active:scale-100
@@ -124,8 +117,9 @@ export default function Sidebar({
                     )}
                     {/* Online status indicator */}
                     <div
-                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-400'
-                        }`}
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                        isOnline ? 'bg-green-500' : 'bg-gray-400'
+                      }`}
                     />
                   </div>
 
@@ -176,7 +170,7 @@ export default function Sidebar({
         </div>
 
         {/* Bottom section */}
-        <div className="mt-4 pt-4 ">
+        <div className="mt-4 pt-4">
           <div className="flex justify-end items-center">
             {/* Toggle button */}
             <button

@@ -9,8 +9,6 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export default function Input({ label, type = "text", ...props }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
-
-  // Prevent hydration mismatch by rendering only after mount
   useEffect(() => setMounted(true), []);
 
   function togglePasswordVisibility() {

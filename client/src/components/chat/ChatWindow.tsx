@@ -1,30 +1,25 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { ChatMessage, User } from "@/types";
 import ChatBubble from "./ChatBubble";
 import ChatHeader from "./ChatHeader";
-import { Menu, Send, UserRoundPen } from "lucide-react";
+import { Send, UserRoundPen } from "lucide-react";
 import { useAuth } from "@/context/useAuth";
+import { useChat } from "@/hooks/useChat";
+import { useReceiver } from "@/context/ReceiverContext";
 
 interface ChatWindowProps {
-  receiver: User | null;
-  messages: ChatMessage[];
-  isOnline: boolean;
-  onSendMessage: (messageText: string) => void; // ✅ Accepts string
   onToggleSidebar: () => void;
   showToggleButton?: boolean;
 }
 
 export default function ChatWindow({
-  receiver,
-  messages,
-  isOnline,
-  onSendMessage,
   onToggleSidebar,
   showToggleButton,
 }: ChatWindowProps) {
   const [input, setInput] = useState("");
   const { user } = useAuth();
+  const {receiver} = useReceiver()
+  const { messages, sendMessage,loading } = useChat(receiver?.id);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when messages change
@@ -45,20 +40,21 @@ export default function ChatWindow({
 
   const handleSend = () => {
     if (!input.trim()) return;
-    
-    // ✅ Just pass the message text
-    onSendMessage(input.trim());
+    sendMessage(input.trim());
     setInput("");
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+ const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      if(e.shiftKey) return
+      else{
       e.preventDefault();
-      handleSend();
+      handleSend();}
     }
-  };
+  }; 
 
   return (
+    <>
     <div className="flex flex-col h-full">
       <ChatHeader
         onToggleSidebar={onToggleSidebar}
@@ -81,12 +77,12 @@ export default function ChatWindow({
 
       <div className="flex-shrink-0 p-3 bg-background border-t border-border">
         <div className="flex items-center gap-2 w-full">
-          <input
+          <textarea
             placeholder="Type message…"
             className="flex-1 min-w-0 bg-surface border border-border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyUp={handleKeyPress}
           />
           <button
             onClick={handleSend}
@@ -98,5 +94,7 @@ export default function ChatWindow({
         </div>
       </div>
     </div>
+    
+    </>
   );
 }
