@@ -1,4 +1,5 @@
 "use client";
+import { useReceiver } from "@/context/ReceiverContext";
 import { useSocket } from "@/context/SocketContext";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { User } from "@/types";
@@ -11,14 +12,15 @@ interface ChatHeaderProps {
   showToggleButton?: boolean;
 }
 
-export default function ChatHeader({ receiver, onToggleSidebar, showToggleButton }: ChatHeaderProps) {
-
+export default function ChatHeader({ onToggleSidebar, showToggleButton }: ChatHeaderProps) {
+  const { receiver } = useReceiver()
   const initial = receiver.name?.charAt(0).toUpperCase();
   const { socket } = useSocket();
   const onlineStatus = useOnlineStatus(socket);
   const isOnline = receiver?.id
-    ? onlineStatus[receiver.id]?.isOnline
+    ? onlineStatus[receiver?.id]?.isOnline
     : false;
+
   return (<>
     <div className="flex items-center justify-between gap-3 p-3 bg-surface border-b border-border select-none">
       <div className="flex flex-row">
@@ -47,7 +49,7 @@ export default function ChatHeader({ receiver, onToggleSidebar, showToggleButton
 
         </div>
       </div>
- 
+
       <div className="flex self-end">
         <button
           onClick={onToggleSidebar}
@@ -57,6 +59,6 @@ export default function ChatHeader({ receiver, onToggleSidebar, showToggleButton
         </button> </div>
     </div>
 
-    </>
+  </>
   );
 }
