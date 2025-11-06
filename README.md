@@ -106,6 +106,7 @@ npm run dev
 ### 1️⃣ Create `.env.local` file inside `/client`
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_SOCKET_URL=http://localhost:5050
 ```
 
 ### 2️⃣ Install dependencies
@@ -127,7 +128,7 @@ Visit: 👉 [http://localhost:3000](http://localhost:3000)
 
 - ✅ JWT Authentication (Register/Login)
 - ✅ Real-Time Chat via Socket.io
-- ✅ AI-Powered Conversation Insights (OpenAI API)
+- ✅ AI-Powered Conversation Insights (HuggingFace)
 - ✅ PostgreSQL Database Integration
 - ✅ Mobile Responsive Dashboard
 - ✅ Online Users Indicator
