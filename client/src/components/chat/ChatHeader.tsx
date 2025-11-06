@@ -1,6 +1,7 @@
 "use client";
 import { useReceiver } from "@/context/ReceiverContext";
 import { useSocket } from "@/context/SocketContext";
+import { useAuth } from "@/context/useAuth";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { User } from "@/types";
 import { Menu } from "lucide-react";
@@ -14,6 +15,7 @@ interface ChatHeaderProps {
 
 export default function ChatHeader({ onToggleSidebar, showToggleButton }: ChatHeaderProps) {
   const { receiver } = useReceiver()
+  const {user} = useAuth()
   const initial = receiver.name?.charAt(0).toUpperCase();
   const { socket } = useSocket();
   const onlineStatus = useOnlineStatus(socket);
@@ -44,7 +46,9 @@ export default function ChatHeader({ onToggleSidebar, showToggleButton }: ChatHe
         <div className="flex flex-col ml-2">
           <span className="font-bold text-sm sm:text-base md:text-lg lg:text-xl">
             {receiver.name}
+           { (user?.user_id ===receiver?.id) &&" (You)"}
           </span>
+          
           <span className="text-xs text-muted-foreground">
             {isOnline ? 'Online' : 'Offline'}
           </span>

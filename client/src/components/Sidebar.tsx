@@ -6,6 +6,7 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useContacts } from "@/hooks/useContacts";
 import { useReceiver } from "@/context/ReceiverContext";
 import { useAllUsers } from "@/hooks/useAllUsers";
+import { useAuth } from "@/context/useAuth";
 
 interface SidebarProps {
   isMobileOpen?: boolean;
@@ -20,14 +21,15 @@ export default function Sidebar({
   const { receiver, setReceiver } = useReceiver();
   const { socket } = useSocket();
   const onlineStatus = useOnlineStatus(socket);
-  const {contacts} = useContacts();
+  const { contacts } = useContacts();
   const { users, loading, error } = useAllUsers();
-
+  const { user } = useAuth()
+  const currentUser = user
   /* ---------- Select a Chat ---------- */
   const handleSelectChat = (contact: any) => {
     const receiverData = contact.user ? contact.user : contact;
     setReceiver(receiverData);
-    
+
     // Close sidebar on mobile after selection
     if (onMobileClose) {
       onMobileClose();
@@ -117,16 +119,18 @@ export default function Sidebar({
                     )}
                     {/* Online status indicator */}
                     <div
-                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-                        isOnline ? 'bg-green-500' : 'bg-gray-400'
-                      }`}
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-400'
+                        }`}
                     />
                   </div>
 
                   <div className="flex flex-col flex-1 min-w-0">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold text-sm truncate">
+                      <span className="font-semibold text-sm truncate flex items-center gap-1">
                         {user.name}
+                        {user.id === currentUser?.user_id && (
+                          <span className="text-gray-500 text-xs">(You)</span>
+                        )}
                       </span>
                       {!showAllUsers && lastMessage?.timestamp && (
                         <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
