@@ -1,7 +1,6 @@
 # 🧠 Smart Communication Hub
 
 A real-time chat dashboard with AI-powered insights that summarize or tag conversations.  
-Built as part of the **V.Connct Full Stack Developer Challenge**.
 
 ---
 
