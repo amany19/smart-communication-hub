@@ -20,7 +20,7 @@ export function useChat(receiverId?: string) {
     const loadMessageHistory = async () => {
       setLoading(true);
       try {
-        const data = await fetchMessages(userId, receiverId);
+        const data = await fetchMessages(receiverId);
         setMessages(data || []);
       } catch (error) {
         console.error("Failed to load messages:", error);

@@ -54,6 +54,7 @@ export default function ChatHeader({ onToggleSidebar, showToggleButton }: ChatHe
           </span>
 
         </div>
+{(user?.user_id ===receiver?.id) &&<span> (You)</span>}
       </div>
 
       <div className="flex self-end">

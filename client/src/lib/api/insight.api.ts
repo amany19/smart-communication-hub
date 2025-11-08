@@ -1,11 +1,13 @@
+import { fetchWithAuth } from "../fetchWithAuth";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050/api";
 
 export async function fetchInsights(sender_id: string, receiver_id: string) {
   try {
-    const res = await fetch(`${BASE_URL}/insights/analyze`, {
+    const res = await fetchWithAuth(`${BASE_URL}/insights/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      // credentials: "include",
       body: JSON.stringify({ sender_id, receiver_id }),
     });
     if (!res.ok) throw new Error("Failed to analyze");

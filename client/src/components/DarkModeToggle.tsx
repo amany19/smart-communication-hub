@@ -6,10 +6,9 @@ export default function DarkModeToggle() {
 
   useEffect(() => {
     const stored = localStorage.getItem("theme");
-    if (stored) {
-      setTheme(stored);
-      document.documentElement.classList.toggle("dark", stored === "dark");
-    }
+    const userTheme = stored || "light";
+    setTheme(userTheme);
+    document.documentElement.classList.toggle("dark", userTheme === "dark");
   }, []);
 
   const toggle = () => {
@@ -22,9 +21,9 @@ export default function DarkModeToggle() {
   return (
     <button
       onClick={toggle}
-      className="p-2 rounded-lg bg-primary text-white dark:bg-darkSurface"
+      className="p-2 rounded-lg bg-[var(--card-bg)] border border-[var(--border-color)]"
     >
-      {theme === "dark" ? "☀️" : "🌙"}
+      {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
     </button>
   );
 }

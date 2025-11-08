@@ -1,6 +1,16 @@
+import { ChatMessage } from ".";
+
 export interface User {
   id: string;
   name: string;
   profilePhoto?: string; 
 }
-//Need to implement ContactUserType 
+export interface ContactUser  {
+  user: {
+    id: string;
+    name: string;
+    profilePhoto?: string;
+  };
+  lastMessage?: ChatMessage;
+};
+export type SidebarItemType =User|ContactUser

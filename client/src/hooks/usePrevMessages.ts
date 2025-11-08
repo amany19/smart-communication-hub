@@ -13,7 +13,7 @@ export function usePrevMessages(receiverId: string) {
     
     const loadInsights = async () => {
       try {
-        const data = await fetchMessages(userId, receiverId);
+        const data = await fetchMessages(receiverId);
         setPrevMessages(data);
       } catch (err) {
         setError("Failed to load messages");

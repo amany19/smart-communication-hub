@@ -21,10 +21,11 @@ export default function Sidebar({
   const { receiver, setReceiver } = useReceiver();
   const { socket } = useSocket();
   const onlineStatus = useOnlineStatus(socket);
-  const { contacts } = useContacts();
+  const { contacts, contacts_loading, contacts_error } = useContacts();
   const { users, loading, error } = useAllUsers();
-  const { user } = useAuth()
-  const currentUser = user
+  const { user } = useAuth();
+  const currentUser = user;
+
   /* ---------- Select a Chat ---------- */
   const handleSelectChat = (contact: any) => {
     const receiverData = contact.user ? contact.user : contact;
@@ -38,6 +39,7 @@ export default function Sidebar({
 
   /* ---------- Toggle Between All Users and Chat Users ---------- */
   const handleToggleUsersView = () => {
+    
     setShowAllUsers(prev => !prev);
   };
 
@@ -84,7 +86,7 @@ export default function Sidebar({
 
         {/* Users list */}
         <div className="flex-1 space-y-2 overflow-y-auto">
-          {loading ? (
+          {(showAllUsers ? loading : contacts_loading) ? (
             <div className="flex justify-center items-center p-4">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
             </div>
@@ -119,8 +121,9 @@ export default function Sidebar({
                     )}
                     {/* Online status indicator */}
                     <div
-                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-400'
-                        }`}
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                        isOnline ? 'bg-green-500' : 'bg-gray-400'
+                      }`}
                     />
                   </div>
 
@@ -166,7 +169,7 @@ export default function Sidebar({
             })
           )}
 
-          {!loading && displayList?.length === 0 && (
+          {!((showAllUsers ? loading : contacts_loading)) && displayList?.length === 0 && (
             <div className="text-center text-gray-500 p-4">
               {showAllUsers ? "No users found" : "No conversations yet"}
             </div>
