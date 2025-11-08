@@ -3,11 +3,12 @@ import authRoutes from './api/auth.route';
 import userRoutes from './api/user.route'
 import messageRoutes from './api/message.route'
 import insightsRoutes from './api/insights.route'
+import { authMiddleware } from '../middlewares/auth.midleware';
 const routes = Router();
 
 routes.use('/auth', authRoutes);
 routes.use('/users', userRoutes); 
-routes.use('/messages', messageRoutes);
-routes.use('/insights', insightsRoutes);
+routes.use('/messages',authMiddleware, messageRoutes);
+routes.use('/insights',authMiddleware, insightsRoutes);
 
 export default routes
