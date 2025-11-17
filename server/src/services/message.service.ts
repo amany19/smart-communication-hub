@@ -11,8 +11,8 @@ export default class MessageService implements IMessage {
     async getMessage(id: string): Promise<MessageType | null> {
         return await this.messageRepo.findById(id);
     }
-    async getConversation(sender_id: string, receiver_id: string): Promise<MessageType[]> {
-        return await this.messageRepo.findConversation(sender_id, receiver_id);
+    async getConversation(sender_id: string, receiver_id: string,offset:number,limit:number): Promise<MessageType[]> {
+        return await this.messageRepo.findConversation(sender_id, receiver_id,offset,limit);
     }
     async getChatList(userId: string):Promise<Partial<MessageType>[]> {
     console.log(`logger ${userId}`)

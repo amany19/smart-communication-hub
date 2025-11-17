@@ -5,6 +5,8 @@ export interface MessageType {
   sender_id: string;
   receiver_id: string;
   text: string;
+  limit?:number;
+  offset?:number;
   timestamp: Date;
   createdAt?: Date;
   updatedAt?: Date;

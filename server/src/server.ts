@@ -3,6 +3,7 @@ import app from "./app"
 import dotenv from 'dotenv'
 import { connectDB } from "./config/database.config";
 import { initSocket } from './socket';
+// import "./types/express";
 
 dotenv.config()
 const PORT = process.env.PORT || 5050;

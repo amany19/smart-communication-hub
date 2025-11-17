@@ -7,8 +7,6 @@ export default class UserController {
 
   // POST /users/register
   register = async (req: Request, res: Response): Promise<void> => {
-          console.log("loggerrrrr")
-      console.log(req.body)
     try {
 
       const user = await this.userService.register(req.body);
