@@ -7,9 +7,6 @@ class InsightsController {
         try {
             const { receiver_id } = req.body;
             const sender_id = req.user?.id
-
-            // const sender_id = (req as any).user?.id;
-
             if (!sender_id || !receiver_id) {
                 return res.status(400).json({
                     error: "sender_id and receiver_id are required"

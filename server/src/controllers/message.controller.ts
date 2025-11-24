@@ -8,9 +8,7 @@ export default class MessageController {
     sendMessage = async (req: Request, res: Response): Promise<void> => {
         try {
             const { receiver_id, text } = req.body;
-            // const sender_id = req.user!.id;
-            // temp bypass for TS
-            const sender_id = (req as any).user?.id;
+            const sender_id = req.user!.id;
 
             if (!sender_id || !receiver_id || !text) {
                 res.status(400).json({ error: 'Missing required fields' });
@@ -48,10 +46,7 @@ export default class MessageController {
     getConversation = async (req: Request, res: Response): Promise<void> => {
         try {
             const { receiverId } = req.params;
-            // const senderId = req.user?.id
-            // temp bypass for TS
-            const senderId = (req as any).user?.id;
-
+            const senderId = req.user?.id
             const limit = Number(req.query.limit) || 30;
             const offset = Number(req.query.offset) || 0;
             const conversation = await this.messageService.getConversation(senderId as string, receiverId, offset, limit);
@@ -63,11 +58,7 @@ export default class MessageController {
     getChatList = async (req: Request, res: Response): Promise<void> => {
          
         try {
-            // const userId =req.user?.id;
-            // temp bypass for TS
-            const userId = (req as any).user?.id;
-            console.log(`logg i${userId}`);
-
+            const userId =req.user?.id;
             const conversation = await this.messageService.getChatList(userId as string);
             res.status(200).json(conversation);
         } catch (error: any) {
